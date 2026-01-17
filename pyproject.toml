@@ -58,6 +58,10 @@ default = [
     "websockets>=13.0",
     "yt-dlp-ejs==0.3.2",
 ]
+remote = [
+    "grpcio>=1.60.0",
+    "protobuf>=4.25.0",
+]
 curl-cffi = [
     "curl-cffi>=0.5.10,!=0.6.*,!=0.7.*,!=0.8.*,!=0.9.*,<0.14; implementation_name=='cpython'",
 ]
