@@ -20,7 +20,7 @@ RUN set -euxo pipefail; \
     else \
         PY_BIN="python3"; \
     fi; \
-    "${PY_BIN}" -m venv "${VENV_PATH}"; \
+    "${PY_BIN}" -m venv --copies "${VENV_PATH}"; \
     . "${VENV_PATH}/bin/activate"; \
     python -m ensurepip --upgrade; \
     pip install --upgrade pip setuptools wheel; \
