@@ -99,6 +99,7 @@ static-analysis = [
 test = [
     "pytest~=8.1",
     "pytest-rerunfailures~=14.0",
+    "yt-dlp[remote]",
 ]
 pyinstaller = [
     "pyinstaller>=6.17.0",  # 6.17.0+ needed for compat with setuptools 81+
