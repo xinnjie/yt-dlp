@@ -6,7 +6,19 @@ from ytdlp.v1 import reserse_executor_pb2 as ytdlp_dot_v1_dot_reserse__executor_
 
 
 class ReverseExecutorStub(object):
-    """Missing associated documentation comment in .proto file."""
+    """ReverseExecutor allows yt-dlp to offload every HTTP request to a remote client
+    (e.g. an iOS device). The typical client workflow is:
+
+    1. Open TaskStream() and immediately send a ClientMessage{hello} describing the
+    device, user agent, and any preloaded cookies.
+    2. Optionally send ClientMessage{task_request} to ask the server to process a
+    URL. The server responds with ServerMessage{task_accepted}.
+    3. For each ServerMessage{request}, perform the HTTP call locally and return
+    the result with ClientMessage{response}. Large bodies may be streamed with
+    ClientMessage{chunk}.
+    4. When yt-dlp finishes extraction it emits ServerMessage{extract_result}. The
+    client can then close the stream or enqueue another TaskRequest.
+    """
 
     def __init__(self, channel):
         """Constructor.
@@ -22,10 +34,22 @@ class ReverseExecutorStub(object):
 
 
 class ReverseExecutorServicer(object):
-    """Missing associated documentation comment in .proto file."""
+    """ReverseExecutor allows yt-dlp to offload every HTTP request to a remote client
+    (e.g. an iOS device). The typical client workflow is:
+
+    1. Open TaskStream() and immediately send a ClientMessage{hello} describing the
+    device, user agent, and any preloaded cookies.
+    2. Optionally send ClientMessage{task_request} to ask the server to process a
+    URL. The server responds with ServerMessage{task_accepted}.
+    3. For each ServerMessage{request}, perform the HTTP call locally and return
+    the result with ClientMessage{response}. Large bodies may be streamed with
+    ClientMessage{chunk}.
+    4. When yt-dlp finishes extraction it emits ServerMessage{extract_result}. The
+    client can then close the stream or enqueue another TaskRequest.
+    """
 
     def TaskStream(self, request_iterator, context):
-        """iPhone initiates a long-lived connection and receives tasks over this stream.
+        """Client maintains a long-lived bidirectional stream and handles tasks.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -48,7 +72,19 @@ def add_ReverseExecutorServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class ReverseExecutor(object):
-    """Missing associated documentation comment in .proto file."""
+    """ReverseExecutor allows yt-dlp to offload every HTTP request to a remote client
+    (e.g. an iOS device). The typical client workflow is:
+
+    1. Open TaskStream() and immediately send a ClientMessage{hello} describing the
+    device, user agent, and any preloaded cookies.
+    2. Optionally send ClientMessage{task_request} to ask the server to process a
+    URL. The server responds with ServerMessage{task_accepted}.
+    3. For each ServerMessage{request}, perform the HTTP call locally and return
+    the result with ClientMessage{response}. Large bodies may be streamed with
+    ClientMessage{chunk}.
+    4. When yt-dlp finishes extraction it emits ServerMessage{extract_result}. The
+    client can then close the stream or enqueue another TaskRequest.
+    """
 
     @staticmethod
     def TaskStream(request_iterator,

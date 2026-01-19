@@ -59,6 +59,17 @@ default = [
     "yt-dlp-ejs==0.3.2",
 ]
 remote = [
+    # default dependencies
+    "brotli; implementation_name=='cpython'",
+    "brotlicffi; implementation_name!='cpython'",
+    "certifi",
+    "mutagen",
+    "pycryptodomex",
+    "requests>=2.32.2,<3",
+    "urllib3>=2.0.2,<3",
+    "websockets>=13.0",
+    "yt-dlp-ejs==0.3.2",
+    # remote extra dependencies
     "grpcio>=1.60.0",
     "protobuf>=4.25.0",
 ]
