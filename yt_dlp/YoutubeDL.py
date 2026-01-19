@@ -4331,7 +4331,7 @@ class YoutubeDL:
             ))
         director.preferences.update(preferences or [])
         if self.params.get('_remote_servicer'):
-             director.preferences.add(lambda rh, _: 1000 if rh.RH_KEY == 'reverse_executor' else 0)
+            director.preferences.add(lambda rh, _: 1000 if rh.RH_KEY == 'reverse_executor' else 0)
         if 'prefer-legacy-http-handler' in self.params['compat_opts']:
             director.preferences.add(lambda rh, _: 500 if rh.RH_KEY == 'Urllib' else 0)
         return director

@@ -3,14 +3,14 @@ repos:
   hooks:
   - id: linter
     name: Apply linter fixes
-    entry: ruff check --fix .
+    entry: bash -c 'ruff check --fix "$@"' --
     language: system
     types: [python]
     require_serial: true
     exclude: ^yt_dlp/protogen/
   - id: format
     name: Apply formatting fixes
-    entry: autopep8 --in-place .
+    entry: bash -c 'autopep8 --in-place "$@"' --
     language: system
     types: [python]
     exclude: ^yt_dlp/protogen/
