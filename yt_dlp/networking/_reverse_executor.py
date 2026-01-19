@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 # Import proto definitions
 # We assume the server environment has set up paths correctly or this module is used where these are available
-from yt_dlp.protogen.ytdlp.v1 import reserse_executor_pb2
+from yt_dlp.protogen.ytdlp.v1 import reverse_executor_pb2
 
 
 @register_rh
@@ -84,7 +84,7 @@ class ReverseExecutorRH(RequestHandler):
         logger.debug('Request %s body length: %d bytes', request_id, len(body))
 
         # Construct proto request
-        proto_req = reserse_executor_pb2.HttpRequest(
+        proto_req = reverse_executor_pb2.HttpRequest(
             request_id=request_id,
             task_id=self.task_id or '',
             method=request.method,

@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from ytdlp.v1 import reserse_executor_pb2 as ytdlp_dot_v1_dot_reserse__executor__pb2
+from ytdlp.v1 import reverse_executor_pb2 as ytdlp_dot_v1_dot_reverse__executor__pb2
 
 
 class ReverseExecutorStub(object):
@@ -28,8 +28,8 @@ class ReverseExecutorStub(object):
         """
         self.TaskStream = channel.stream_stream(
                 '/ytdlp.v1.ReverseExecutor/TaskStream',
-                request_serializer=ytdlp_dot_v1_dot_reserse__executor__pb2.ClientMessage.SerializeToString,
-                response_deserializer=ytdlp_dot_v1_dot_reserse__executor__pb2.ServerMessage.FromString,
+                request_serializer=ytdlp_dot_v1_dot_reverse__executor__pb2.ClientMessage.SerializeToString,
+                response_deserializer=ytdlp_dot_v1_dot_reverse__executor__pb2.ServerMessage.FromString,
                 _registered_method=True)
 
 
@@ -60,8 +60,8 @@ def add_ReverseExecutorServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'TaskStream': grpc.stream_stream_rpc_method_handler(
                     servicer.TaskStream,
-                    request_deserializer=ytdlp_dot_v1_dot_reserse__executor__pb2.ClientMessage.FromString,
-                    response_serializer=ytdlp_dot_v1_dot_reserse__executor__pb2.ServerMessage.SerializeToString,
+                    request_deserializer=ytdlp_dot_v1_dot_reverse__executor__pb2.ClientMessage.FromString,
+                    response_serializer=ytdlp_dot_v1_dot_reverse__executor__pb2.ServerMessage.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -101,8 +101,8 @@ class ReverseExecutor(object):
             request_iterator,
             target,
             '/ytdlp.v1.ReverseExecutor/TaskStream',
-            ytdlp_dot_v1_dot_reserse__executor__pb2.ClientMessage.SerializeToString,
-            ytdlp_dot_v1_dot_reserse__executor__pb2.ServerMessage.FromString,
+            ytdlp_dot_v1_dot_reverse__executor__pb2.ClientMessage.SerializeToString,
+            ytdlp_dot_v1_dot_reverse__executor__pb2.ServerMessage.FromString,
             options,
             channel_credentials,
             insecure,

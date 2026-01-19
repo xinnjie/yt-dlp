@@ -6,7 +6,7 @@ import json
 import requests
 import grpc
 
-from yt_dlp.protogen.ytdlp.v1 import reserse_executor_pb2, reserse_executor_pb2_grpc
+from yt_dlp.protogen.ytdlp.v1 import reverse_executor_pb2, reverse_executor_pb2_grpc
 
 from yt_dlp.remote.server import serve
 
@@ -17,7 +17,7 @@ logger = logging.getLogger('TestClient')
 
 def run_test_client(server_port, video_url):
     channel = grpc.insecure_channel(f'localhost:{server_port}')
-    stub = reserse_executor_pb2_grpc.ReverseExecutorStub(channel)
+    stub = reverse_executor_pb2_grpc.ReverseExecutorStub(channel)
 
     request_queue = queue.Queue()
 
@@ -36,18 +36,18 @@ def run_test_client(server_port, video_url):
 
     # Send Hello first
     logger.info('Sending Hello...')
-    hello = reserse_executor_pb2.Hello(
+    hello = reverse_executor_pb2.Hello(
         device_id='test-device-001',
         user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         app_version='1.0.0',
         capabilities={'http_chunking': 'true'},
     )
-    request_queue.put(reserse_executor_pb2.ClientMessage(hello=hello))
+    request_queue.put(reverse_executor_pb2.ClientMessage(hello=hello))
 
     # Send TaskRequest
     logger.info(f'Sending TaskRequest for {video_url}...')
     task_id = 'task-001'
-    task_req = reserse_executor_pb2.TaskRequest(
+    task_req = reverse_executor_pb2.TaskRequest(
         task_id=task_id,
         url=video_url,
         options={
@@ -56,7 +56,7 @@ def run_test_client(server_port, video_url):
             # "skip_download": "true" # We want extract_info not download, server handles this but good to be explicit if passed to ydl
         },
     )
-    request_queue.put(reserse_executor_pb2.ClientMessage(task_request=task_req))
+    request_queue.put(reverse_executor_pb2.ClientMessage(task_request=task_req))
 
     try:
         responses = stub.TaskStream(request_iterator())
@@ -89,7 +89,7 @@ def run_test_client(server_port, video_url):
                     logger.info(f'Request complete: {resp.status_code} len={len(resp.content)}')
 
                     # Send response back
-                    client_resp = reserse_executor_pb2.HttpResponse(
+                    client_resp = reverse_executor_pb2.HttpResponse(
                         request_id=req.request_id,
                         task_id=req.task_id,
                         status=resp.status_code,
@@ -97,16 +97,16 @@ def run_test_client(server_port, video_url):
                         body=resp.content,
                         final_url=resp.url,
                     )
-                    request_queue.put(reserse_executor_pb2.ClientMessage(response=client_resp))
+                    request_queue.put(reverse_executor_pb2.ClientMessage(response=client_resp))
 
                 except Exception as e:
                     logger.error(f'Request failed: {e}')
-                    err = reserse_executor_pb2.Error(
+                    err = reverse_executor_pb2.Error(
                         request_id=req.request_id,
                         code='HTTP_ERROR',
                         message=str(e),
                     )
-                    request_queue.put(reserse_executor_pb2.ClientMessage(error=err))
+                    request_queue.put(reverse_executor_pb2.ClientMessage(error=err))
 
             elif payload == 'extract_result':
                 result = msg.extract_result
@@ -140,8 +140,8 @@ def run_test_client(server_port, video_url):
 
             elif payload == 'ping':
                 # Respond to ping
-                request_queue.put(reserse_executor_pb2.ClientMessage(
-                    pong=reserse_executor_pb2.Pong(nonce=msg.ping.nonce),
+                request_queue.put(reverse_executor_pb2.ClientMessage(
+                    pong=reverse_executor_pb2.Pong(nonce=msg.ping.nonce),
                 ))
 
     except grpc.RpcError as e:

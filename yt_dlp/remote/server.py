@@ -40,7 +40,7 @@ import os
 
 import grpc
 
-from yt_dlp.protogen.ytdlp.v1 import reserse_executor_pb2, reserse_executor_pb2_grpc
+from yt_dlp.protogen.ytdlp.v1 import reverse_executor_pb2, reverse_executor_pb2_grpc
 
 from yt_dlp import YoutubeDL
 from yt_dlp.cookies import YoutubeDLCookieJar
@@ -56,7 +56,7 @@ class RequestFuture:
         self.error = None
 
 
-class ReverseExecutorServicer(reserse_executor_pb2_grpc.ReverseExecutorServicer):
+class ReverseExecutorServicer(reverse_executor_pb2_grpc.ReverseExecutorServicer):
     def __init__(self, debug_printtraffic: bool = False):
         self._request_queues: dict[str, queue.Queue] = {}  # connection_id -> Queue[ServerMessage]
         self._pending_requests: dict[str, RequestFuture] = {}  # request_id -> RequestFuture
@@ -103,7 +103,7 @@ class ReverseExecutorServicer(reserse_executor_pb2_grpc.ReverseExecutorServicer)
             # Cancel any pending requests for this connection?
             # Ideally yes, but complex tracking needed.
 
-    def _handle_client_message(self, connection_id: str, msg: reserse_executor_pb2.ClientMessage):
+    def _handle_client_message(self, connection_id: str, msg: reverse_executor_pb2.ClientMessage):
         payload_type = msg.WhichOneof('payload')
 
         if payload_type == 'hello':
@@ -119,7 +119,7 @@ class ReverseExecutorServicer(reserse_executor_pb2_grpc.ReverseExecutorServicer)
         elif payload_type == 'pong':
             logger.debug(f'Received Pong from {connection_id}')
 
-    def _handle_hello(self, connection_id: str, hello: reserse_executor_pb2.Hello):
+    def _handle_hello(self, connection_id: str, hello: reverse_executor_pb2.Hello):
         logger.info(f'Hello from {connection_id}: {hello.device_id} (UA: {hello.user_agent})')
         with self._lock:
             self._client_contexts[connection_id] = {
@@ -129,12 +129,12 @@ class ReverseExecutorServicer(reserse_executor_pb2_grpc.ReverseExecutorServicer)
                 'capabilities': hello.capabilities,
             }
 
-    def _handle_task_request(self, connection_id: str, request: reserse_executor_pb2.TaskRequest):
+    def _handle_task_request(self, connection_id: str, request: reverse_executor_pb2.TaskRequest):
         logger.info(f'Received task {request.task_id} for {request.url}')
 
         # Acknowledge task
-        self._send_server_message(connection_id, reserse_executor_pb2.ServerMessage(
-            task_accepted=reserse_executor_pb2.TaskAccepted(
+        self._send_server_message(connection_id, reverse_executor_pb2.ServerMessage(
+            task_accepted=reverse_executor_pb2.TaskAccepted(
                 task_id=request.task_id,
                 message='Task accepted',
             ),
@@ -216,8 +216,8 @@ class ReverseExecutorServicer(reserse_executor_pb2_grpc.ReverseExecutorServicer)
                     # Send result
                     if info:
                         info_json = json.dumps(info).encode('utf-8')
-                        self._send_server_message(connection_id, reserse_executor_pb2.ServerMessage(
-                            extract_result=reserse_executor_pb2.ExtractResult(
+                        self._send_server_message(connection_id, reverse_executor_pb2.ServerMessage(
+                            extract_result=reverse_executor_pb2.ExtractResult(
                                 task_id=request.task_id,
                                 info_json=info_json,
                             ),
@@ -229,8 +229,8 @@ class ReverseExecutorServicer(reserse_executor_pb2_grpc.ReverseExecutorServicer)
             except Exception as e:
                 logger.error(f'Task {request.task_id} failed: {e}')
                 traceback.print_exc()
-                self._send_server_message(connection_id, reserse_executor_pb2.ServerMessage(
-                    error=reserse_executor_pb2.Error(
+                self._send_server_message(connection_id, reverse_executor_pb2.ServerMessage(
+                    error=reverse_executor_pb2.Error(
                         task_id=request.task_id,
                         code='TASK_FAILED',
                         message=str(e),
@@ -243,7 +243,7 @@ class ReverseExecutorServicer(reserse_executor_pb2_grpc.ReverseExecutorServicer)
 
         threading.Thread(target=run_task, daemon=True).start()
 
-    def _handle_http_response(self, response: reserse_executor_pb2.HttpResponse):
+    def _handle_http_response(self, response: reverse_executor_pb2.HttpResponse):
         req_id = response.request_id
         with self._lock:
             future = self._pending_requests.get(req_id)
@@ -252,7 +252,7 @@ class ReverseExecutorServicer(reserse_executor_pb2_grpc.ReverseExecutorServicer)
             future.response = response
             future.event.set()
 
-    def _handle_http_chunk(self, chunk: reserse_executor_pb2.HttpChunk):
+    def _handle_http_chunk(self, chunk: reverse_executor_pb2.HttpChunk):
         req_id = chunk.request_id
         with self._lock:
             future = self._pending_requests.get(req_id)
@@ -262,7 +262,7 @@ class ReverseExecutorServicer(reserse_executor_pb2_grpc.ReverseExecutorServicer)
             if chunk.eof:
                 future.event.set()
 
-    def _handle_error(self, error: reserse_executor_pb2.Error):
+    def _handle_error(self, error: reverse_executor_pb2.Error):
         if error.request_id:
             with self._lock:
                 future = self._pending_requests.get(error.request_id)
@@ -272,19 +272,19 @@ class ReverseExecutorServicer(reserse_executor_pb2_grpc.ReverseExecutorServicer)
         else:
             logger.error(f'Received generic error: {error.message}')
 
-    def _send_server_message(self, connection_id: str, msg: reserse_executor_pb2.ServerMessage):
+    def _send_server_message(self, connection_id: str, msg: reverse_executor_pb2.ServerMessage):
         with self._lock:
             q = self._request_queues.get(connection_id)
         if q:
             q.put(msg)
 
-    def submit_request(self, connection_id: str, task_id: str, request: reserse_executor_pb2.HttpRequest) -> RequestFuture:
+    def submit_request(self, connection_id: str, task_id: str, request: reverse_executor_pb2.HttpRequest) -> RequestFuture:
         """Called by ReverseExecutorRequestHandler to send a request"""
         future = RequestFuture()
         with self._lock:
             self._pending_requests[request.request_id] = future
 
-        msg = reserse_executor_pb2.ServerMessage(request=request)
+        msg = reverse_executor_pb2.ServerMessage(request=request)
         self._send_server_message(connection_id, msg)
 
         return future
@@ -296,12 +296,12 @@ class ReverseExecutorServicer(reserse_executor_pb2_grpc.ReverseExecutorServicer)
 
 
 def serve(port=50051, debug_printtraffic: bool = False):
-    if not reserse_executor_pb2_grpc:
+    if not reverse_executor_pb2_grpc:
         logger.error('gRPC modules not loaded, cannot start server')
         return
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    reserse_executor_pb2_grpc.add_ReverseExecutorServicer_to_server(
+    reverse_executor_pb2_grpc.add_ReverseExecutorServicer_to_server(
         ReverseExecutorServicer(debug_printtraffic=debug_printtraffic), server,
     )
     server.add_insecure_port(f'[::]:{port}')
