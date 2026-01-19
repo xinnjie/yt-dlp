@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1fytdlp/v1/reverse_executor.proto\x12\x08ytdlp.v1\"\xea\x02\n\rClientMessage\x12\'\n\x05hello\x18\x01 \x01(\x0b\x32\x0f.ytdlp.v1.HelloH\x00R\x05hello\x12:\n\x0ctask_request\x18\x02 \x01(\x0b\x32\x15.ytdlp.v1.TaskRequestH\x00R\x0btaskRequest\x12\x34\n\x08response\x18\x03 \x01(\x0b\x32\x16.ytdlp.v1.HttpResponseH\x00R\x08response\x12+\n\x05\x63hunk\x18\x04 \x01(\x0b\x32\x13.ytdlp.v1.HttpChunkH\x00R\x05\x63hunk\x12$\n\x04pong\x18\x05 \x01(\x0b\x32\x0e.ytdlp.v1.PongH\x00R\x04pong\x12\x37\n\x0btask_result\x18\x06 \x01(\x0b\x32\x14.ytdlp.v1.TaskResultH\x00R\ntaskResult\x12\'\n\x05\x65rror\x18\x07 \x01(\x0b\x32\x0f.ytdlp.v1.ErrorH\x00R\x05\x65rrorB\t\n\x07payload\"\xc9\x02\n\rServerMessage\x12=\n\rtask_accepted\x18\x01 \x01(\x0b\x32\x16.ytdlp.v1.TaskAcceptedH\x00R\x0ctaskAccepted\x12\x31\n\x07request\x18\x02 \x01(\x0b\x32\x15.ytdlp.v1.HttpRequestH\x00R\x07request\x12$\n\x04ping\x18\x03 \x01(\x0b\x32\x0e.ytdlp.v1.PingH\x00R\x04ping\x12*\n\x06\x63\x61ncel\x18\x04 \x01(\x0b\x32\x10.ytdlp.v1.CancelH\x00R\x06\x63\x61ncel\x12@\n\x0e\x65xtract_result\x18\x05 \x01(\x0b\x32\x17.ytdlp.v1.ExtractResultH\x00R\rextractResult\x12\'\n\x05\x65rror\x18\x06 \x01(\x0b\x32\x0f.ytdlp.v1.ErrorH\x00R\x05\x65rrorB\t\n\x07payload\"\x98\x02\n\x05Hello\x12\x1b\n\tdevice_id\x18\x01 \x01(\tR\x08\x64\x65viceId\x12\x1d\n\nuser_agent\x18\x02 \x01(\tR\tuserAgent\x12\x1f\n\x0b\x61pp_version\x18\x03 \x01(\tR\nappVersion\x12*\n\x07\x63ookies\x18\x04 \x03(\x0b\x32\x10.ytdlp.v1.CookieR\x07\x63ookies\x12\x45\n\x0c\x63\x61pabilities\x18\x05 \x03(\x0b\x32!.ytdlp.v1.Hello.CapabilitiesEntryR\x0c\x63\x61pabilities\x1a?\n\x11\x43\x61pabilitiesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\xb2\x01\n\x0bTaskRequest\x12\x17\n\x07task_id\x18\x01 \x01(\tR\x06taskId\x12\x10\n\x03url\x18\x02 \x01(\tR\x03url\x12<\n\x07options\x18\x03 \x03(\x0b\x32\".ytdlp.v1.TaskRequest.OptionsEntryR\x07options\x1a:\n\x0cOptionsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"A\n\x0cTaskAccepted\x12\x17\n\x07task_id\x18\x01 \x01(\tR\x06taskId\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\"\xc7\x02\n\x0bHttpRequest\x12\x1d\n\nrequest_id\x18\x01 \x01(\tR\trequestId\x12\x17\n\x07task_id\x18\x02 \x01(\tR\x06taskId\x12\x16\n\x06method\x18\x03 \x01(\tR\x06method\x12\x10\n\x03url\x18\x04 \x01(\tR\x03url\x12<\n\x07headers\x18\x05 \x03(\x0b\x32\".ytdlp.v1.HttpRequest.HeadersEntryR\x07headers\x12\x12\n\x04\x62ody\x18\x06 \x01(\x0cR\x04\x62ody\x12\x1d\n\ntimeout_ms\x18\x07 \x01(\x05R\ttimeoutMs\x12)\n\x10\x66ollow_redirects\x18\x08 \x01(\x08R\x0f\x66ollowRedirects\x1a:\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x8a\x02\n\x0cHttpResponse\x12\x1d\n\nrequest_id\x18\x01 \x01(\tR\trequestId\x12\x17\n\x07task_id\x18\x02 \x01(\tR\x06taskId\x12\x16\n\x06status\x18\x03 \x01(\x05R\x06status\x12=\n\x07headers\x18\x04 \x03(\x0b\x32#.ytdlp.v1.HttpResponse.HeadersEntryR\x07headers\x12\x12\n\x04\x62ody\x18\x05 \x01(\x0cR\x04\x62ody\x12\x1b\n\tfinal_url\x18\x06 \x01(\tR\x08\x66inalUrl\x1a:\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"k\n\tHttpChunk\x12\x1d\n\nrequest_id\x18\x01 \x01(\tR\trequestId\x12\x17\n\x07task_id\x18\x02 \x01(\tR\x06taskId\x12\x14\n\x05\x62ytes\x18\x03 \x01(\x0cR\x05\x62ytes\x12\x10\n\x03\x65of\x18\x04 \x01(\x08R\x03\x65of\"E\n\rExtractResult\x12\x17\n\x07task_id\x18\x01 \x01(\tR\x06taskId\x12\x1b\n\tinfo_json\x18\x02 \x01(\x0cR\x08infoJson\"W\n\nTaskResult\x12\x17\n\x07task_id\x18\x01 \x01(\tR\x06taskId\x12\x16\n\x06status\x18\x02 \x01(\tR\x06status\x12\x18\n\x07message\x18\x03 \x01(\tR\x07message\"9\n\x06\x43\x61ncel\x12\x17\n\x07task_id\x18\x01 \x01(\tR\x06taskId\x12\x16\n\x06reason\x18\x02 \x01(\tR\x06reason\"B\n\x04Ping\x12\x14\n\x05nonce\x18\x01 \x01(\tR\x05nonce\x12$\n\x0eserver_time_ms\x18\x02 \x01(\x03R\x0cserverTimeMs\"B\n\x04Pong\x12\x14\n\x05nonce\x18\x01 \x01(\tR\x05nonce\x12$\n\x0e\x63lient_time_ms\x18\x02 \x01(\x03R\x0c\x63lientTimeMs\"\xb6\x01\n\x06\x43ookie\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value\x12\x16\n\x06\x64omain\x18\x03 \x01(\tR\x06\x64omain\x12\x12\n\x04path\x18\x04 \x01(\tR\x04path\x12!\n\x0c\x65xpires_unix\x18\x05 \x01(\x03R\x0b\x65xpiresUnix\x12\x1b\n\thttp_only\x18\x06 \x01(\x08R\x08httpOnly\x12\x16\n\x06secure\x18\x07 \x01(\x08R\x06secure\"m\n\x05\x45rror\x12\x17\n\x07task_id\x18\x01 \x01(\tR\x06taskId\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\trequestId\x12\x12\n\x04\x63ode\x18\x03 \x01(\tR\x04\x63ode\x12\x18\n\x07message\x18\x04 \x01(\tR\x07message2U\n\x0fReverseExecutor\x12\x42\n\nTaskStream\x12\x17.ytdlp.v1.ClientMessage\x1a\x17.ytdlp.v1.ServerMessage(\x01\x30\x01\x42\x9e\x01\n\x0c\x63om.ytdlp.v1B\x14ReverseExecutorProtoP\x01Z7github.com/xinnjie/watchbeats/protogen/ytdlp/v1;ytdlpv1\xa2\x02\x03YXX\xaa\x02\x08Ytdlp.V1\xca\x02\x08Ytdlp\\V1\xe2\x02\x14Ytdlp\\V1\\GPBMetadata\xea\x02\tYtdlp::V1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1fytdlp/v1/reverse_executor.proto\x12\x08ytdlp.v1\"\xc4\x02\n\rClientMessage\x12\'\n\x05hello\x18\x01 \x01(\x0b\x32\x0f.ytdlp.v1.HelloH\x00R\x05hello\x12:\n\x0ctask_request\x18\x02 \x01(\x0b\x32\x15.ytdlp.v1.TaskRequestH\x00R\x0btaskRequest\x12\x34\n\x08response\x18\x03 \x01(\x0b\x32\x16.ytdlp.v1.HttpResponseH\x00R\x08response\x12+\n\x05\x63hunk\x18\x04 \x01(\x0b\x32\x13.ytdlp.v1.HttpChunkH\x00R\x05\x63hunk\x12\x37\n\x0btask_result\x18\x06 \x01(\x0b\x32\x14.ytdlp.v1.TaskResultH\x00R\ntaskResult\x12\'\n\x05\x65rror\x18\x07 \x01(\x0b\x32\x0f.ytdlp.v1.ErrorH\x00R\x05\x65rrorB\t\n\x07payload\"\xce\x01\n\rServerMessage\x12=\n\rtask_accepted\x18\x01 \x01(\x0b\x32\x16.ytdlp.v1.TaskAcceptedH\x00R\x0ctaskAccepted\x12\x31\n\x07request\x18\x02 \x01(\x0b\x32\x15.ytdlp.v1.HttpRequestH\x00R\x07request\x12@\n\x0e\x65xtract_result\x18\x05 \x01(\x0b\x32\x17.ytdlp.v1.ExtractResultH\x00R\rextractResultB\t\n\x07payload\"\x98\x02\n\x05Hello\x12\x1b\n\tdevice_id\x18\x01 \x01(\tR\x08\x64\x65viceId\x12\x1d\n\nuser_agent\x18\x02 \x01(\tR\tuserAgent\x12\x1f\n\x0b\x61pp_version\x18\x03 \x01(\tR\nappVersion\x12*\n\x07\x63ookies\x18\x04 \x03(\x0b\x32\x10.ytdlp.v1.CookieR\x07\x63ookies\x12\x45\n\x0c\x63\x61pabilities\x18\x05 \x03(\x0b\x32!.ytdlp.v1.Hello.CapabilitiesEntryR\x0c\x63\x61pabilities\x1a?\n\x11\x43\x61pabilitiesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\xb2\x01\n\x0bTaskRequest\x12\x17\n\x07task_id\x18\x01 \x01(\tR\x06taskId\x12\x10\n\x03url\x18\x02 \x01(\tR\x03url\x12<\n\x07options\x18\x03 \x03(\x0b\x32\".ytdlp.v1.TaskRequest.OptionsEntryR\x07options\x1a:\n\x0cOptionsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"A\n\x0cTaskAccepted\x12\x17\n\x07task_id\x18\x01 \x01(\tR\x06taskId\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\"\xc7\x02\n\x0bHttpRequest\x12\x1d\n\nrequest_id\x18\x01 \x01(\tR\trequestId\x12\x17\n\x07task_id\x18\x02 \x01(\tR\x06taskId\x12\x16\n\x06method\x18\x03 \x01(\tR\x06method\x12\x10\n\x03url\x18\x04 \x01(\tR\x03url\x12<\n\x07headers\x18\x05 \x03(\x0b\x32\".ytdlp.v1.HttpRequest.HeadersEntryR\x07headers\x12\x12\n\x04\x62ody\x18\x06 \x01(\x0cR\x04\x62ody\x12\x1d\n\ntimeout_ms\x18\x07 \x01(\x05R\ttimeoutMs\x12)\n\x10\x66ollow_redirects\x18\x08 \x01(\x08R\x0f\x66ollowRedirects\x1a:\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x8a\x02\n\x0cHttpResponse\x12\x1d\n\nrequest_id\x18\x01 \x01(\tR\trequestId\x12\x17\n\x07task_id\x18\x02 \x01(\tR\x06taskId\x12\x16\n\x06status\x18\x03 \x01(\x05R\x06status\x12=\n\x07headers\x18\x04 \x03(\x0b\x32#.ytdlp.v1.HttpResponse.HeadersEntryR\x07headers\x12\x12\n\x04\x62ody\x18\x05 \x01(\x0cR\x04\x62ody\x12\x1b\n\tfinal_url\x18\x06 \x01(\tR\x08\x66inalUrl\x1a:\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"k\n\tHttpChunk\x12\x1d\n\nrequest_id\x18\x01 \x01(\tR\trequestId\x12\x17\n\x07task_id\x18\x02 \x01(\tR\x06taskId\x12\x14\n\x05\x62ytes\x18\x03 \x01(\x0cR\x05\x62ytes\x12\x10\n\x03\x65of\x18\x04 \x01(\x08R\x03\x65of\"E\n\rExtractResult\x12\x17\n\x07task_id\x18\x01 \x01(\tR\x06taskId\x12\x1b\n\tinfo_json\x18\x02 \x01(\tR\x08infoJson\"W\n\nTaskResult\x12\x17\n\x07task_id\x18\x01 \x01(\tR\x06taskId\x12\x16\n\x06status\x18\x02 \x01(\tR\x06status\x12\x18\n\x07message\x18\x03 \x01(\tR\x07message\"\xb6\x01\n\x06\x43ookie\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value\x12\x16\n\x06\x64omain\x18\x03 \x01(\tR\x06\x64omain\x12\x12\n\x04path\x18\x04 \x01(\tR\x04path\x12!\n\x0c\x65xpires_unix\x18\x05 \x01(\x03R\x0b\x65xpiresUnix\x12\x1b\n\thttp_only\x18\x06 \x01(\x08R\x08httpOnly\x12\x16\n\x06secure\x18\x07 \x01(\x08R\x06secure\"m\n\x05\x45rror\x12\x17\n\x07task_id\x18\x01 \x01(\tR\x06taskId\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\trequestId\x12\x12\n\x04\x63ode\x18\x03 \x01(\tR\x04\x63ode\x12\x18\n\x07message\x18\x04 \x01(\tR\x07message2U\n\x0fReverseExecutor\x12\x42\n\nTaskStream\x12\x17.ytdlp.v1.ClientMessage\x1a\x17.ytdlp.v1.ServerMessage(\x01\x30\x01\x42\x9e\x01\n\x0c\x63om.ytdlp.v1B\x14ReverseExecutorProtoP\x01Z7github.com/xinnjie/watchbeats/protogen/ytdlp/v1;ytdlpv1\xa2\x02\x03YXX\xaa\x02\x08Ytdlp.V1\xca\x02\x08Ytdlp\\V1\xe2\x02\x14Ytdlp\\V1\\GPBMetadata\xea\x02\tYtdlp::V1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -41,43 +41,37 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_HTTPRESPONSE_HEADERSENTRY']._loaded_options = None
   _globals['_HTTPRESPONSE_HEADERSENTRY']._serialized_options = b'8\001'
   _globals['_CLIENTMESSAGE']._serialized_start=46
-  _globals['_CLIENTMESSAGE']._serialized_end=408
-  _globals['_SERVERMESSAGE']._serialized_start=411
-  _globals['_SERVERMESSAGE']._serialized_end=740
-  _globals['_HELLO']._serialized_start=743
-  _globals['_HELLO']._serialized_end=1023
-  _globals['_HELLO_CAPABILITIESENTRY']._serialized_start=960
-  _globals['_HELLO_CAPABILITIESENTRY']._serialized_end=1023
-  _globals['_TASKREQUEST']._serialized_start=1026
-  _globals['_TASKREQUEST']._serialized_end=1204
-  _globals['_TASKREQUEST_OPTIONSENTRY']._serialized_start=1146
-  _globals['_TASKREQUEST_OPTIONSENTRY']._serialized_end=1204
-  _globals['_TASKACCEPTED']._serialized_start=1206
-  _globals['_TASKACCEPTED']._serialized_end=1271
-  _globals['_HTTPREQUEST']._serialized_start=1274
-  _globals['_HTTPREQUEST']._serialized_end=1601
-  _globals['_HTTPREQUEST_HEADERSENTRY']._serialized_start=1543
-  _globals['_HTTPREQUEST_HEADERSENTRY']._serialized_end=1601
-  _globals['_HTTPRESPONSE']._serialized_start=1604
-  _globals['_HTTPRESPONSE']._serialized_end=1870
-  _globals['_HTTPRESPONSE_HEADERSENTRY']._serialized_start=1543
-  _globals['_HTTPRESPONSE_HEADERSENTRY']._serialized_end=1601
-  _globals['_HTTPCHUNK']._serialized_start=1872
-  _globals['_HTTPCHUNK']._serialized_end=1979
-  _globals['_EXTRACTRESULT']._serialized_start=1981
-  _globals['_EXTRACTRESULT']._serialized_end=2050
-  _globals['_TASKRESULT']._serialized_start=2052
-  _globals['_TASKRESULT']._serialized_end=2139
-  _globals['_CANCEL']._serialized_start=2141
-  _globals['_CANCEL']._serialized_end=2198
-  _globals['_PING']._serialized_start=2200
-  _globals['_PING']._serialized_end=2266
-  _globals['_PONG']._serialized_start=2268
-  _globals['_PONG']._serialized_end=2334
-  _globals['_COOKIE']._serialized_start=2337
-  _globals['_COOKIE']._serialized_end=2519
-  _globals['_ERROR']._serialized_start=2521
-  _globals['_ERROR']._serialized_end=2630
-  _globals['_REVERSEEXECUTOR']._serialized_start=2632
-  _globals['_REVERSEEXECUTOR']._serialized_end=2717
+  _globals['_CLIENTMESSAGE']._serialized_end=370
+  _globals['_SERVERMESSAGE']._serialized_start=373
+  _globals['_SERVERMESSAGE']._serialized_end=579
+  _globals['_HELLO']._serialized_start=582
+  _globals['_HELLO']._serialized_end=862
+  _globals['_HELLO_CAPABILITIESENTRY']._serialized_start=799
+  _globals['_HELLO_CAPABILITIESENTRY']._serialized_end=862
+  _globals['_TASKREQUEST']._serialized_start=865
+  _globals['_TASKREQUEST']._serialized_end=1043
+  _globals['_TASKREQUEST_OPTIONSENTRY']._serialized_start=985
+  _globals['_TASKREQUEST_OPTIONSENTRY']._serialized_end=1043
+  _globals['_TASKACCEPTED']._serialized_start=1045
+  _globals['_TASKACCEPTED']._serialized_end=1110
+  _globals['_HTTPREQUEST']._serialized_start=1113
+  _globals['_HTTPREQUEST']._serialized_end=1440
+  _globals['_HTTPREQUEST_HEADERSENTRY']._serialized_start=1382
+  _globals['_HTTPREQUEST_HEADERSENTRY']._serialized_end=1440
+  _globals['_HTTPRESPONSE']._serialized_start=1443
+  _globals['_HTTPRESPONSE']._serialized_end=1709
+  _globals['_HTTPRESPONSE_HEADERSENTRY']._serialized_start=1382
+  _globals['_HTTPRESPONSE_HEADERSENTRY']._serialized_end=1440
+  _globals['_HTTPCHUNK']._serialized_start=1711
+  _globals['_HTTPCHUNK']._serialized_end=1818
+  _globals['_EXTRACTRESULT']._serialized_start=1820
+  _globals['_EXTRACTRESULT']._serialized_end=1889
+  _globals['_TASKRESULT']._serialized_start=1891
+  _globals['_TASKRESULT']._serialized_end=1978
+  _globals['_COOKIE']._serialized_start=1981
+  _globals['_COOKIE']._serialized_end=2163
+  _globals['_ERROR']._serialized_start=2165
+  _globals['_ERROR']._serialized_end=2274
+  _globals['_REVERSEEXECUTOR']._serialized_start=2276
+  _globals['_REVERSEEXECUTOR']._serialized_end=2361
 # @@protoc_insertion_point(module_scope)

@@ -44,8 +44,25 @@ from yt_dlp.protogen.ytdlp.v1 import reverse_executor_pb2, reverse_executor_pb2_
 
 from yt_dlp import YoutubeDL
 from yt_dlp.cookies import YoutubeDLCookieJar
+from yt_dlp.utils import ExtractorError
 
 logger = logging.getLogger(__name__)
+
+
+def _is_login_required_error(exc: Exception) -> bool:
+    if not isinstance(exc, ExtractorError):
+        return False
+    message = ' '.join(filter(None, (
+        getattr(exc, 'orig_msg', None),
+        exc.msg if hasattr(exc, 'msg') else None,
+    ))).lower()
+    keywords = (
+        'login required',
+        'registered users',
+        'authentication is required',
+        'use --cookies',
+    )
+    return any(keyword in message for keyword in keywords)
 
 
 class RequestFuture:
@@ -61,6 +78,7 @@ class ReverseExecutorServicer(reverse_executor_pb2_grpc.ReverseExecutorServicer)
         self._request_queues: dict[str, queue.Queue] = {}  # connection_id -> Queue[ServerMessage]
         self._pending_requests: dict[str, RequestFuture] = {}  # request_id -> RequestFuture
         self._client_contexts: dict[str, dict[str, Any]] = {}  # connection_id -> context dict
+        self._stream_contexts: dict[str, grpc.ServicerContext] = {}
         self._lock = threading.Lock()
         self._debug_printtraffic = debug_printtraffic
 
@@ -73,6 +91,7 @@ class ReverseExecutorServicer(reverse_executor_pb2_grpc.ReverseExecutorServicer)
         with self._lock:
             self._request_queues[connection_id] = response_queue
             self._client_contexts[connection_id] = {}
+            self._stream_contexts[connection_id] = context
 
         # Thread to consume requests from client
         def consume_requests():
@@ -94,14 +113,24 @@ class ReverseExecutorServicer(reverse_executor_pb2_grpc.ReverseExecutorServicer)
                     break
                 yield msg
         finally:
-            logger.info(f'Connection closed: {connection_id}')
+            logger.debug(f'Connection closed: {connection_id}')
             with self._lock:
                 if connection_id in self._request_queues:
                     del self._request_queues[connection_id]
                 if connection_id in self._client_contexts:
                     del self._client_contexts[connection_id]
+                if connection_id in self._stream_contexts:
+                    del self._stream_contexts[connection_id]
             # Cancel any pending requests for this connection?
             # Ideally yes, but complex tracking needed.
+
+    def _abort_connection(self, connection_id: str, status_code: grpc.StatusCode, details: str):
+        with self._lock:
+            context = self._stream_contexts.get(connection_id)
+        if not context:
+            return
+        with contextlib.suppress(grpc.RpcError):
+            context.abort(status_code, details)
 
     def _handle_client_message(self, connection_id: str, msg: reverse_executor_pb2.ClientMessage):
         payload_type = msg.WhichOneof('payload')
@@ -116,11 +145,9 @@ class ReverseExecutorServicer(reverse_executor_pb2_grpc.ReverseExecutorServicer)
             self._handle_http_chunk(msg.chunk)
         elif payload_type == 'error':
             self._handle_error(msg.error)
-        elif payload_type == 'pong':
-            logger.debug(f'Received Pong from {connection_id}')
 
     def _handle_hello(self, connection_id: str, hello: reverse_executor_pb2.Hello):
-        logger.info(f'Hello from {connection_id}: {hello.device_id} (UA: {hello.user_agent})')
+        logger.debug(f'Hello from {connection_id}: {hello.device_id} (UA: {hello.user_agent})')
         with self._lock:
             self._client_contexts[connection_id] = {
                 'device_id': hello.device_id,
@@ -130,7 +157,7 @@ class ReverseExecutorServicer(reverse_executor_pb2_grpc.ReverseExecutorServicer)
             }
 
     def _handle_task_request(self, connection_id: str, request: reverse_executor_pb2.TaskRequest):
-        logger.info(f'Received task {request.task_id} for {request.url}')
+        logger.debug(f'Received task {request.task_id} for {request.url}')
 
         # Acknowledge task
         self._send_server_message(connection_id, reverse_executor_pb2.ServerMessage(
@@ -200,7 +227,7 @@ class ReverseExecutorServicer(reverse_executor_pb2_grpc.ReverseExecutorServicer)
 
                         jar.save()
                         opts['cookiefile'] = cookie_file_path
-                        logger.info(f'Created temporary cookie file: {cookie_file_path}')
+                        logger.debug(f'Created temporary cookie file: {cookie_file_path}')
                     except Exception as e:
                         logger.error(f'Failed to setup cookies: {e}')
 
@@ -213,9 +240,11 @@ class ReverseExecutorServicer(reverse_executor_pb2_grpc.ReverseExecutorServicer)
                 with YoutubeDL(opts) as ydl:
                     info = ydl.extract_info(request.url, download=False)
 
-                    # Send result
                     if info:
                         info_json = json.dumps(info).encode('utf-8')
+                        with open('/tmp/info_json_dump.json', 'wb') as f:
+                            f.write(info_json)
+
                         self._send_server_message(connection_id, reverse_executor_pb2.ServerMessage(
                             extract_result=reverse_executor_pb2.ExtractResult(
                                 task_id=request.task_id,
@@ -229,13 +258,10 @@ class ReverseExecutorServicer(reverse_executor_pb2_grpc.ReverseExecutorServicer)
             except Exception as e:
                 logger.error(f'Task {request.task_id} failed: {e}')
                 traceback.print_exc()
-                self._send_server_message(connection_id, reverse_executor_pb2.ServerMessage(
-                    error=reverse_executor_pb2.Error(
-                        task_id=request.task_id,
-                        code='TASK_FAILED',
-                        message=str(e),
-                    ),
-                ))
+                if _is_login_required_error(e):
+                    self._abort_connection(connection_id, grpc.StatusCode.UNAUTHENTICATED, 'login required: ' + str(e))
+                else:
+                    self._abort_connection(connection_id, grpc.StatusCode.INTERNAL, 'task failed: ' + str(e))
             finally:
                 if cookie_file_path and os.path.exists(cookie_file_path):
                     with contextlib.suppress(OSError):
@@ -270,7 +296,7 @@ class ReverseExecutorServicer(reverse_executor_pb2_grpc.ReverseExecutorServicer)
                 future.error = error
                 future.event.set()
         else:
-            logger.error(f'Received generic error: {error.message}')
+            logger.warning(f'Received generic error: {error.message}')
 
     def _send_server_message(self, connection_id: str, msg: reverse_executor_pb2.ServerMessage):
         with self._lock:
@@ -296,10 +322,6 @@ class ReverseExecutorServicer(reverse_executor_pb2_grpc.ReverseExecutorServicer)
 
 
 def serve(port=50051, debug_printtraffic: bool = False):
-    if not reverse_executor_pb2_grpc:
-        logger.error('gRPC modules not loaded, cannot start server')
-        return
-
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     reverse_executor_pb2_grpc.add_ReverseExecutorServicer_to_server(
         ReverseExecutorServicer(debug_printtraffic=debug_printtraffic), server,

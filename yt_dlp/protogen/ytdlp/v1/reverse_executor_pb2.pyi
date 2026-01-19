@@ -6,38 +6,30 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class ClientMessage(_message.Message):
-    __slots__ = ("hello", "task_request", "response", "chunk", "pong", "task_result", "error")
+    __slots__ = ("hello", "task_request", "response", "chunk", "task_result", "error")
     HELLO_FIELD_NUMBER: _ClassVar[int]
     TASK_REQUEST_FIELD_NUMBER: _ClassVar[int]
     RESPONSE_FIELD_NUMBER: _ClassVar[int]
     CHUNK_FIELD_NUMBER: _ClassVar[int]
-    PONG_FIELD_NUMBER: _ClassVar[int]
     TASK_RESULT_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     hello: Hello
     task_request: TaskRequest
     response: HttpResponse
     chunk: HttpChunk
-    pong: Pong
     task_result: TaskResult
     error: Error
-    def __init__(self, hello: _Optional[_Union[Hello, _Mapping]] = ..., task_request: _Optional[_Union[TaskRequest, _Mapping]] = ..., response: _Optional[_Union[HttpResponse, _Mapping]] = ..., chunk: _Optional[_Union[HttpChunk, _Mapping]] = ..., pong: _Optional[_Union[Pong, _Mapping]] = ..., task_result: _Optional[_Union[TaskResult, _Mapping]] = ..., error: _Optional[_Union[Error, _Mapping]] = ...) -> None: ...
+    def __init__(self, hello: _Optional[_Union[Hello, _Mapping]] = ..., task_request: _Optional[_Union[TaskRequest, _Mapping]] = ..., response: _Optional[_Union[HttpResponse, _Mapping]] = ..., chunk: _Optional[_Union[HttpChunk, _Mapping]] = ..., task_result: _Optional[_Union[TaskResult, _Mapping]] = ..., error: _Optional[_Union[Error, _Mapping]] = ...) -> None: ...
 
 class ServerMessage(_message.Message):
-    __slots__ = ("task_accepted", "request", "ping", "cancel", "extract_result", "error")
+    __slots__ = ("task_accepted", "request", "extract_result")
     TASK_ACCEPTED_FIELD_NUMBER: _ClassVar[int]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
-    PING_FIELD_NUMBER: _ClassVar[int]
-    CANCEL_FIELD_NUMBER: _ClassVar[int]
     EXTRACT_RESULT_FIELD_NUMBER: _ClassVar[int]
-    ERROR_FIELD_NUMBER: _ClassVar[int]
     task_accepted: TaskAccepted
     request: HttpRequest
-    ping: Ping
-    cancel: Cancel
     extract_result: ExtractResult
-    error: Error
-    def __init__(self, task_accepted: _Optional[_Union[TaskAccepted, _Mapping]] = ..., request: _Optional[_Union[HttpRequest, _Mapping]] = ..., ping: _Optional[_Union[Ping, _Mapping]] = ..., cancel: _Optional[_Union[Cancel, _Mapping]] = ..., extract_result: _Optional[_Union[ExtractResult, _Mapping]] = ..., error: _Optional[_Union[Error, _Mapping]] = ...) -> None: ...
+    def __init__(self, task_accepted: _Optional[_Union[TaskAccepted, _Mapping]] = ..., request: _Optional[_Union[HttpRequest, _Mapping]] = ..., extract_result: _Optional[_Union[ExtractResult, _Mapping]] = ...) -> None: ...
 
 class Hello(_message.Message):
     __slots__ = ("device_id", "user_agent", "app_version", "cookies", "capabilities")
@@ -152,8 +144,8 @@ class ExtractResult(_message.Message):
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
     INFO_JSON_FIELD_NUMBER: _ClassVar[int]
     task_id: str
-    info_json: bytes
-    def __init__(self, task_id: _Optional[str] = ..., info_json: _Optional[bytes] = ...) -> None: ...
+    info_json: str
+    def __init__(self, task_id: _Optional[str] = ..., info_json: _Optional[str] = ...) -> None: ...
 
 class TaskResult(_message.Message):
     __slots__ = ("task_id", "status", "message")
@@ -164,30 +156,6 @@ class TaskResult(_message.Message):
     status: str
     message: str
     def __init__(self, task_id: _Optional[str] = ..., status: _Optional[str] = ..., message: _Optional[str] = ...) -> None: ...
-
-class Cancel(_message.Message):
-    __slots__ = ("task_id", "reason")
-    TASK_ID_FIELD_NUMBER: _ClassVar[int]
-    REASON_FIELD_NUMBER: _ClassVar[int]
-    task_id: str
-    reason: str
-    def __init__(self, task_id: _Optional[str] = ..., reason: _Optional[str] = ...) -> None: ...
-
-class Ping(_message.Message):
-    __slots__ = ("nonce", "server_time_ms")
-    NONCE_FIELD_NUMBER: _ClassVar[int]
-    SERVER_TIME_MS_FIELD_NUMBER: _ClassVar[int]
-    nonce: str
-    server_time_ms: int
-    def __init__(self, nonce: _Optional[str] = ..., server_time_ms: _Optional[int] = ...) -> None: ...
-
-class Pong(_message.Message):
-    __slots__ = ("nonce", "client_time_ms")
-    NONCE_FIELD_NUMBER: _ClassVar[int]
-    CLIENT_TIME_MS_FIELD_NUMBER: _ClassVar[int]
-    nonce: str
-    client_time_ms: int
-    def __init__(self, nonce: _Optional[str] = ..., client_time_ms: _Optional[int] = ...) -> None: ...
 
 class Cookie(_message.Message):
     __slots__ = ("name", "value", "domain", "path", "expires_unix", "http_only", "secure")

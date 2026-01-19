@@ -50,6 +50,7 @@ class ReverseExecutorServicer(object):
 
     def TaskStream(self, request_iterator, context):
         """Client maintains a long-lived bidirectional stream and handles tasks.
+        return gRPC status code UNAUTHENTICATED when login is required.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
