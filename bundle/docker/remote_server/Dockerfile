@@ -2,6 +2,7 @@
 ARG BUILDIMAGE=ghcr.io/yt-dlp/manylinux2014_x86_64-shared:latest
 ARG RUNTIMEIMAGE=python:3.13-slim
 ARG PYTHON_VERSION=3.13
+ARG DENO_VERSION=2.6.4
 
 FROM ${BUILDIMAGE} AS build
 
@@ -29,10 +30,26 @@ RUN set -euxo pipefail; \
 
 FROM ${RUNTIMEIMAGE} AS runtime
 
+ARG DENO_VERSION
+
 ENV VENV_PATH=/opt/yt-dlp-venv \
     PATH=/opt/yt-dlp-venv/bin:${PATH} \
     PYTHONUNBUFFERED=1 \
     PYTHONNOUSERSITE=1
+
+RUN set -euxo pipefail; \
+    apt-get update; \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates curl unzip; \
+    rm -rf /var/lib/apt/lists/*; \
+    case "$(dpkg --print-architecture)" in \
+        amd64) deno_arch=x86_64 ;; \
+        arm64) deno_arch=aarch64 ;; \
+        *) echo "Unsupported architecture: $(dpkg --print-architecture)" >&2; exit 1 ;; \
+    esac; \
+    curl -fsSL "https://github.com/denoland/deno/releases/download/v${DENO_VERSION}/deno-${deno_arch}-unknown-linux-gnu.zip" -o /tmp/deno.zip; \
+    unzip -p /tmp/deno.zip deno >/usr/local/bin/deno; \
+    chmod +x /usr/local/bin/deno; \
+    rm -f /tmp/deno.zip
 
 COPY --from=build ${VENV_PATH} ${VENV_PATH}
 
