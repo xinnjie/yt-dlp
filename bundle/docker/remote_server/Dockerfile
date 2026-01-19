@@ -39,5 +39,5 @@ COPY --from=build ${VENV_PATH} ${VENV_PATH}
 WORKDIR /srv/yt-dlp
 EXPOSE 50051
 
-ENTRYPOINT ["/opt/yt-dlp-venv/bin/python", "-m", "yt_dlp.remote.server"]
+ENTRYPOINT ["/opt/yt-dlp-venv/bin/python3", "-m", "yt_dlp.remote.server"]
 CMD ["--port", "50051"]
