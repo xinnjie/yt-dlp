@@ -155,6 +155,8 @@ class ReverseExecutorServicer(reserse_executor_pb2_grpc.ReverseExecutorServicer)
                     '_remote_servicer': self,
                     '_connection_id': connection_id,
                     '_task_id': request.task_id,
+                    # Disable file system caching in server
+                    'cachedir': False,
                 }
                 if self._debug_printtraffic:
                     opts['debug_printtraffic'] = True
