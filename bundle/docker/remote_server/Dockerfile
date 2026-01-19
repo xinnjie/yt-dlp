@@ -37,6 +37,7 @@ ENV VENV_PATH=/opt/yt-dlp-venv \
     PYTHONUNBUFFERED=1 \
     PYTHONNOUSERSITE=1
 
+# install deno
 RUN set -euxo pipefail; \
     apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates curl unzip; \
