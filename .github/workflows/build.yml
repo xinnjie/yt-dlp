@@ -30,6 +30,9 @@ on:
       windows:
         default: true
         type: boolean
+      remote_server_image:
+        default: true
+        type: boolean
     secrets:
       GPG_SIGNING_KEY:
         required: false
@@ -71,6 +74,10 @@ on:
         type: boolean
       windows:
         description: yt-dlp.exe, yt-dlp_win.zip, yt-dlp_x86.exe, yt-dlp_win_x86.zip, yt-dlp_arm64.exe, yt-dlp_win_arm64.zip
+        default: true
+        type: boolean
+      remote_server_image:
+        description: Build and push the yt-dlp remote server Docker image to GHCR
         default: true
         type: boolean
 
@@ -508,6 +515,67 @@ jobs:
             dist/yt-dlp${{ env.SUFFIX }}.exe
             dist/yt-dlp_win${{ env.SUFFIX }}.zip
           compression-level: 0
+
+  remote_server_image:
+    name: Remote server image
+    needs: [process]
+    if: inputs.remote_server_image
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ubuntu-latest
+    env:
+      CHANNEL: ${{ inputs.channel }}
+      VERSION: ${{ needs.process.outputs.version }}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6.0.1
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130  # v3.7.0
+
+      - name: Create buildx builder
+        run: |
+          docker buildx create --name remote-server-builder --use
+          docker buildx inspect --bootstrap
+
+      - name: Log in to GHCR
+        env:
+          CR_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "${CR_PAT}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
+
+      - name: Compute image tags
+        id: remote_meta
+        run: |
+          set -euo pipefail
+          IMAGE="ghcr.io/${{ github.repository_owner }}/yt-dlp-remote-server"
+          CHANNEL="${CHANNEL}"
+          SAFE_CHANNEL=$(echo "${CHANNEL}" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9.-' '-')
+          if [ -z "${SAFE_CHANNEL}" ]; then
+              SAFE_CHANNEL="channel"
+          fi
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          TAGS="${IMAGE}:${VERSION} ${IMAGE}:${SAFE_CHANNEL} ${IMAGE}:sha-${SHORT_SHA}"
+          {
+              echo "image=${IMAGE}"
+              echo "tags=${TAGS}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Build and push image
+        env:
+          TAGS: ${{ steps.remote_meta.outputs.tags }}
+        run: |
+          set -euo pipefail
+          TAG_ARGS=""
+          for tag in ${TAGS}; do
+            TAG_ARGS="${TAG_ARGS} --tag ${tag}"
+          done
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            --file bundle/docker/remote_server/Dockerfile \
+            ${TAG_ARGS} \
+            --push \
+            .
 
   meta_files:
     name: Metadata files
