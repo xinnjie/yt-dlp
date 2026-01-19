@@ -522,13 +522,16 @@ jobs:
     if: inputs.remote_server_image
     permissions:
       contents: read
-      packages: write
+      packages: write  # required to push container images to GHCR
     runs-on: ubuntu-latest
     env:
       CHANNEL: ${{ inputs.channel }}
       VERSION: ${{ needs.process.outputs.version }}
+      REPO_OWNER: ${{ github.repository_owner }}
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130  # v3.7.0
@@ -542,23 +545,26 @@ jobs:
         env:
           CR_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "${CR_PAT}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
+          echo "${CR_PAT}" | docker login ghcr.io -u "${REPO_OWNER}" --password-stdin
 
       - name: Compute image tags
         id: remote_meta
         run: |
           set -euo pipefail
-          IMAGE="ghcr.io/${{ github.repository_owner }}/yt-dlp-remote-server"
-          CHANNEL="${CHANNEL}"
-          SAFE_CHANNEL=$(echo "${CHANNEL}" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9.-' '-')
+          IMAGE="ghcr.io/${REPO_OWNER}/yt-dlp-remote-server"
+          SAFE_CHANNEL=$(echo "${CHANNEL:-}" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9.-' '-')
           if [ -z "${SAFE_CHANNEL}" ]; then
               SAFE_CHANNEL="channel"
           fi
           SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
-          TAGS="${IMAGE}:${VERSION} ${IMAGE}:${SAFE_CHANNEL} ${IMAGE}:sha-${SHORT_SHA}"
           {
               echo "image=${IMAGE}"
-              echo "tags=${TAGS}"
+              echo 'tags<<EOF'
+              printf '%s\n' \
+                "${IMAGE}:${VERSION}" \
+                "${IMAGE}:${SAFE_CHANNEL}" \
+                "${IMAGE}:sha-${SHORT_SHA}"
+              echo 'EOF'
           } >> "${GITHUB_OUTPUT}"
 
       - name: Build and push image
@@ -566,14 +572,18 @@ jobs:
           TAGS: ${{ steps.remote_meta.outputs.tags }}
         run: |
           set -euo pipefail
-          TAG_ARGS=""
-          for tag in ${TAGS}; do
-            TAG_ARGS="${TAG_ARGS} --tag ${tag}"
-          done
+          TAG_ARGS=()
+          while IFS= read -r tag; do
+            TAG_ARGS+=("--tag" "${tag}")
+          done <<<"${TAGS}"
+          if [ "${#TAG_ARGS[@]}" -eq 0 ]; then
+            echo "No tags generated" >&2
+            exit 1
+          fi
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --file bundle/docker/remote_server/Dockerfile \
-            ${TAG_ARGS} \
+            "${TAG_ARGS[@]}" \
             --push \
             .
 
