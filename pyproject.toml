@@ -202,6 +202,7 @@ python = [
 
 [tool.ruff]
 line-length = 120
+extend-exclude = ["yt_dlp/protogen"]
 
 [tool.ruff.lint]
 ignore = [
@@ -410,7 +411,7 @@ select = [
     "W391",
     "W504",
 ]
-exclude = "*/extractor/lazy_extractors.py,*venv*,*/test/testdata/sigs/player-*.js,.idea,.vscode"
+exclude = "*/extractor/lazy_extractors.py,*venv*,*/test/testdata/sigs/player-*.js,.idea,.vscode,*/yt_dlp/protogen/*"
 
 [tool.pytest.ini_options]
 addopts = [

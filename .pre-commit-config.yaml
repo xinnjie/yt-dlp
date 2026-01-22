@@ -7,10 +7,8 @@ repos:
     language: system
     types: [python]
     require_serial: true
-    exclude: ^yt_dlp/protogen/
   - id: format
     name: Apply formatting fixes
     entry: bash -c 'autopep8 --in-place "$@"' --
     language: system
     types: [python]
-    exclude: ^yt_dlp/protogen/
