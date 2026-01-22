@@ -202,6 +202,7 @@ python = [
 
 [tool.ruff]
 line-length = 120
+extend-exclude = ["yt_dlp/protogen"]
 
 [tool.ruff.lint]
 ignore = [
