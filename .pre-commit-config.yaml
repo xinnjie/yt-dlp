@@ -3,12 +3,12 @@ repos:
   hooks:
   - id: linter
     name: Apply linter fixes
-    entry: bash -c 'ruff check --fix "$@"' --
+    entry: ruff check --fix .
     language: system
     types: [python]
     require_serial: true
   - id: format
     name: Apply formatting fixes
-    entry: bash -c 'autopep8 --in-place "$@"' --
+    entry: autopep8 --in-place .
     language: system
     types: [python]
