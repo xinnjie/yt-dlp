@@ -36,3 +36,10 @@ except ImportError:
     pass
 except Exception as e:
     warnings.warn(f'Failed to import "curl_cffi" request handler: {e}' + bug_reports_message())
+
+try:
+    from . import _reverse_executor
+except ImportError:
+    pass
+except Exception as e:
+    warnings.warn(f'Failed to import "reverse_executor" request handler: {e}' + bug_reports_message())

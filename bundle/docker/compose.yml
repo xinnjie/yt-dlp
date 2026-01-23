@@ -35,6 +35,40 @@ services:
     volumes:
       - ../../dist:/build
 
+  remote_server_linux_x86_64:
+    image: ${REMOTE_SERVER_IMAGE_LINUX_X86_64:-yt-dlp-remote-server:linux-x86_64}
+    build:
+      context: ../..
+      dockerfile: bundle/docker/remote_server/Dockerfile
+      platforms:
+        - "linux/amd64"
+      args:
+        BUILDIMAGE: ghcr.io/yt-dlp/manylinux2014_x86_64-shared:latest
+        RUNTIMEIMAGE: python:3.13-slim
+        PYTHON_VERSION: "3.13"
+
+  remote_server_linux_x86_64_verify:
+    image: ${REMOTE_SERVER_IMAGE_LINUX_X86_64:-yt-dlp-remote-server:linux-x86_64}
+    platform: "linux/amd64"
+    command: ["python3", "-m", "yt_dlp.remote.server", "--help"]
+
+  remote_server_linux_aarch64:
+    image: ${REMOTE_SERVER_IMAGE_LINUX_AARCH64:-yt-dlp-remote-server:linux-aarch64}
+    build:
+      context: ../..
+      dockerfile: bundle/docker/remote_server/Dockerfile
+      platforms:
+        - "linux/arm64"
+      args:
+        BUILDIMAGE: ghcr.io/yt-dlp/manylinux2014_aarch64-shared:latest
+        RUNTIMEIMAGE: python:3.13-slim
+        PYTHON_VERSION: "3.13"
+
+  remote_server_linux_aarch64_verify:
+    image: ${REMOTE_SERVER_IMAGE_LINUX_AARCH64:-yt-dlp-remote-server:linux-aarch64}
+    platform: "linux/arm64"
+    command: ["python3", "-m", "yt_dlp.remote.server", "--help"]
+
   linux_aarch64:
     build:
       context: linux

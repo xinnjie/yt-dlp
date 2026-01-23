@@ -58,6 +58,21 @@ default = [
     "websockets>=13.0",
     "yt-dlp-ejs==0.3.2",
 ]
+remote = [
+    # default dependencies
+    "brotli; implementation_name=='cpython'",
+    "brotlicffi; implementation_name!='cpython'",
+    "certifi",
+    "mutagen",
+    "pycryptodomex",
+    "requests>=2.32.2,<3",
+    "urllib3>=2.0.2,<3",
+    "websockets>=13.0",
+    "yt-dlp-ejs==0.3.2",
+    # remote extra dependencies
+    "grpcio>=1.60.0",
+    "protobuf>=4.25.0",
+]
 curl-cffi = [
     "curl-cffi>=0.5.10,!=0.6.*,!=0.7.*,!=0.8.*,!=0.9.*,<0.15; implementation_name=='cpython'",
 ]
@@ -91,6 +106,7 @@ static-analysis = [
 test = [
     "pytest~=8.1",
     "pytest-rerunfailures~=14.0",
+    "yt-dlp[remote]",
 ]
 pyinstaller = [
     "pyinstaller>=6.17.0",  # 6.17.0+ needed for compat with setuptools 81+
@@ -193,6 +209,7 @@ python = [
 
 [tool.ruff]
 line-length = 120
+extend-exclude = ["yt_dlp/protogen"]
 
 [tool.ruff.lint]
 ignore = [
@@ -401,7 +418,7 @@ select = [
     "W391",
     "W504",
 ]
-exclude = "*/extractor/lazy_extractors.py,*venv*,*/test/testdata/sigs/player-*.js,.idea,.vscode"
+exclude = "*/extractor/lazy_extractors.py,*venv*,*/test/testdata/sigs/player-*.js,.idea,.vscode,*/yt_dlp/protogen/*"
 
 [tool.pytest.ini_options]
 addopts = [
